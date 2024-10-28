@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>개선된 얼굴 인식 기반 예측 유지보수 시스템</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        .iphone-frame {
+            position: relative;
+            width: 390px;
+            height: 844px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 55px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 35px;
+            background-color: #000;
+            border-bottom-left-radius: 18px;
+            border-bottom-right-radius: 18px;
+            z-index: 1000;
+        }
+        #videoElement {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .overlay {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 15px;
+            z-index: 1000;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .overlay.visible {
+            opacity: 1;
+        }
+        .machine-info {
+            margin-bottom: 20px;
+        }
+        .machine-status {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .status-label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        .status-value {
+            font-weight: 700;
+            font-size: 16px;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        .status-ok { background-color: #4CAF50; color: #fff; }
+        .status-warning { background-color: #FFC107; color: #000; }
+        .status-danger { background-color: #F44336; color: #fff; }
+        .chart-container {
+            height: 150px;
+            margin-top: 20px;
+        }
+        .controls {
+            position: absolute;
+            bottom: 40px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-around;
+        }
+        .btn {
+            padding: 12px 24px;
+            background-color: #0A84FF;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        #errorMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(244, 67, 54, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="iphone-frame">
+        <div class="notch"></div>
+        <video id="videoElement" autoplay playsinline></video>
+        <div id="infoOverlay" class="overlay">
+            <div class="machine-info">
+                <h3>기계 #A1289 - 컨베이어 벨트</h3>
+                <div class="machine-status">
+                    <span class="status-label">상태</span>
+                    <span id="overallStatus" class="status-value status-ok">정상</span>
+                </div>
+                <div class="machine-status">
+                    <span class="status-label">예상 수명</span>
+                    <span id="estimatedLifespan" class="status-value">365일</span>
+                </div>
+                <div class="machine-status">
+                    <span class="status-label">다음 유지보수</span>
+                    <span id="nextMaintenance" class="status-value">30일 후</span>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+        <div class="controls">
+            <button id="scanButton" class="btn">기계 스캔</button>
+            <button id="detailsButton" class="btn">상세 정보</button>
+        </div>
+        <div id="errorMessage"></div>
+    </div>
+
+    <script>
+        const videoElement = document.getElementById('videoElement');
+        const infoOverlay = document.getElementById('infoOverlay');
+        const errorMessage = document.getElementById('errorMessage');
+        let model;
+        let isScanning = false;
+        let currentPerformanceIndex = 90;
+        let lastUpdateTime = 0;
+
+        async function setupCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoElement.srcObject = stream;
+                return new Promise((resolve) => {
+                    videoElement.onloadedmetadata = () => {
+                        resolve(videoElement);
+                    };
+                });
+            } catch (error) {
+                console.error("카메라 접근 오류:", error);
+                showError("카메라를 시작할 수 없습니다. 카메라 권한을 확인해주세요.");
+            }
+        }
+
+        async function loadFaceDetectionModel() {
+            try {
+                model = await blazeface.load();
+            } catch (error) {
+                console.error("모델 로딩 오류:", error);
+                showError("얼굴 인식 모델을 로드할 수 없습니다.");
+            }
+        }
+
+        async function detectFace() {
+            if (!isScanning) return;
+            try {
+                const predictions = await model.estimateFaces(videoElement, false);
+                if (predictions.length > 0) {
+                    infoOverlay.classList.add('visible');
+                    const currentTime = Date.now();
+                    if (currentTime - lastUpdateTime > 5000) {
+                        updateUI();
+                        lastUpdateTime = currentTime;
+                    }
+                } else {
+                    infoOverlay.classList.remove('visible');
+                }
+                requestAnimationFrame(detectFace);
+            } catch (error) {
+                console.error("얼굴 감지 오류:", error);
+                showError("얼굴 감지 중 오류가 발생했습니다.");
+            }
+        }
+
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        const performanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: '성능 지수',
+                    data: [],
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+        function smoothChange(currentValue, targetValue, smoothFactor = 0.1) {
+            return currentValue + (targetValue - currentValue) * smoothFactor;
+        }
+
+        async function predictMaintenance(sensorData) {
+            const model = await tf.sequential({
+                layers: [
+                    tf.layers.dense({inputShape: [4], units: 10, activation: 'relu'}),
+                    tf.layers.dense({units: 1, activation: 'sigmoid'})
+                ]
+            });
+
+            const prediction = model.predict(tf.tensor2d([sensorData]));
+            return prediction.dataSync()[0];
+        }
+
+        function generateSensorData() {
+            return [
+                Math.random() * 100,
+                Math.random() * 1000,
+                Math.random() * 50,
+                Math.random() * 10
+            ];
+        }
+
+        async function updateUI() {
+            const sensorData = generateSensorData();
+            const maintenanceProbability = await predictMaintenance(sensorData);
+
+            const targetPerformanceIndex = 100 - (maintenanceProbability * 100);
+            currentPerformanceIndex = smoothChange(currentPerformanceIndex, targetPerformanceIndex);
+            
+            document.getElementById('overallStatus').textContent = 
+                currentPerformanceIndex > 80 ? '정상' : 
+                currentPerformanceIndex > 50 ? '주의' : '위험';
+            document.getElementById('overallStatus').className = 
+                `status-value ${currentPerformanceIndex > 80 ? 'status-ok' : 
+                currentPerformanceIndex > 50 ? 'status-warning' : 'status-danger'}`;
+
+            const estimatedLifespan = Math.round(365 * (currentPerformanceIndex / 100));
+            document.getElementById('estimatedLifespan').textContent = `${estimatedLifespan}일`;
+
+            const nextMaintenance = Math.round(30 * (currentPerformanceIndex / 100));
+            document.getElementById('nextMaintenance').textContent = `${nextMaintenance}일 후`;
+
+            updateChart(currentPerformanceIndex);
+        }
+
+        function updateChart(performanceIndex) {
+            performanceChart.data.labels.push(new Date().toLocaleTimeString());
+            performanceChart.data.datasets[0].data.push(performanceIndex);
+
+            if (performanceChart.data.labels.length > 10) {
+                performanceChart.data.labels.shift();
+                performanceChart.data.datasets[0].data.shift();
+            }
+
+            performanceChart.update();
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        async function init() {
+            try {
+                await setupCamera();
+                await loadFaceDetectionModel();
+                document.getElementById('scanButton').addEventListener('click', () => {
+                    isScanning = !isScanning;
+                    if (isScanning) {
+                        detectFace();
+                        document.getElementById('scanButton').textContent = '스캔 중지';
+                    } else {
+                        document.getElementById('scanButton').textContent = '기계 스캔';
+                        infoOverlay.classList.remove('visible');
+                    }
+                });
+                document.getElementById('detailsButton').addEventListener('click', () => {
+                    alert('상세 정보 페이지로 이동합니다.');
+                });
+            } catch (error) {
+                console.error("초기화 오류:", error);
+                showError("시스템을 초기화하는 중 오류가 발생했습니다.");
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
