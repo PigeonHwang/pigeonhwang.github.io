@@ -3,6 +3,9 @@
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <!-- we import arjs version without NFT but with marker + location based support -->
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <script>
+    document.getElementById('ahu1_value').setAttribute('value', 'AHU #2');
+  </script>
   <body style="margin : 0px; overflow: hidden;">
     <a-scene embedded arjs>
       <a-marker preset="hiro">
@@ -14,7 +17,7 @@
           ⚠️⚠️⚠️
         -->
         <a-plane position="0 0 0" rotation="-90 0 0" width="2" height="2" color="#7BC8A4"></a-plane>
-        <a-text value="AHU #1" rotation="-90 0 0" color="black"></a-text>
+        <a-text id="ahu1_value" value="AHU #1" rotation="-90 0 0" color="black"></a-text>
       </a-marker>
       <a-entity camera></a-entity>
     </a-scene>
