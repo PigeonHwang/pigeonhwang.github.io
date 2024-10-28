@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html>
-  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-  <!-- we import arjs version without NFT but with marker + location based support -->
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-  <script>
-    window.onload = (event) => {
-      document.getElementById('ahu1_value').setAttribute('value', 'AHU #2');
-    }
-  </script>
-  <body style="margin : 0px; overflow: hidden;">
+<head>
+    <meta charset="utf-8">
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <!-- we import arjs version without NFT but with marker + location based support -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script>
+        window.onload = (event) => {
+            document.getElementById('ahu1_value').setAttribute('value', 'AHU #2');
+        }
+    </script>
+</head>
+<body style="margin : 0px; overflow: hidden;">
     <a-scene embedded arjs>
-      <a-marker preset="hiro">
-        <!-- we use cors proxy to avoid cross-origin problems -->
-        <!--
-          ⚠️⚠️⚠️
-          https://arjs-cors-proxy.herokuapp.com/ is now offline, Heroku has dismissed all his free plans from November 2022.
-          You need to host your own proxy and use it instead. The proxy is based on CORS Anywhere (see https://github.com/Rob--W/cors-anywhere).
-          ⚠️⚠️⚠️
-        -->
-        <a-plane position="0 0 0" rotation="-90 0 0" width="2" height="2" color="#7BC8A4"></a-plane>
-        <a-text id="ahu1_value" value="AHU #1" position="0 0 0.1" rotation="-90 0 0" color="black"></a-text>
-      </a-marker>
-      <a-entity camera></a-entity>
+        <a-marker preset="hiro">
+            <a-plane position="0 0 0" rotation="-90 0 0" width="2" height="2" color="#7BC8A4"></a-plane>
+            <a-text id="rc" value="R상 전류" position="1 0 0.2" rotation="-90 0 0" width="0.2" color="black"></a-text>
+            <a-text id="sc" value="S상 전류" position="0.8 0 0.2" rotation="-90 0 0" width="0.2" color="black"></a-text>
+            <a-text id="tc" value="T상 전류" position="0.6 0 0.2" rotation="-90 0 0" width="0.2" color="black"></a-text>
+            <a-text id="rv" value="R상 전압" position="0.4 0 0.2" rotation="-90 0 0" width="0.2" color="black"></a-text>
+            <a-text id="sv" value="S상 전압" position="0.2 0 0.2" rotation="-90 0 0" width="0.2" color="black"></a-text>
+            <a-text id="tv" value="T상 전압" position="0 0 0.2" rotation="-90 0 0" width="0.2" color="black"></a-text>
+        </a-marker>
+        <a-entity camera></a-entity>
     </a-scene>
-  </body>
+</body>
 </html>
