@@ -116,6 +116,8 @@
         clearTimeout(label.highlightTimeout);
         label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
 
+        prompt("인식")
+
         isFaceDetected = true;
         infoPanel.classList.add('visible');
         predictions.forEach(prediction => {
