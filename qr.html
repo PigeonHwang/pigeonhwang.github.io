@@ -5,11 +5,10 @@
     <title>QR Scanner Demo</title>
 </head>
 <body>
-<h1>Scan from WebCam:</h1>
 <div id="video-container">
     <video id="qr-video"></video>
 </div>
-<div>
+<div display="none">
     <label>
         Highlight Style
         <select id="scan-region-highlight-style-select">
@@ -23,7 +22,7 @@
         Show scan region canvas
     </label>
 </div>
-<div>
+<div display="none">
     <select id="inversion-mode-select">
         <option value="original">Scan original (dark QR code on bright background)</option>
         <option value="invert">Scan with inverted colors (bright QR code on dark background)</option>
@@ -34,7 +33,7 @@
 <b>Device has camera: </b>
 <span id="cam-has-camera"></span>
 <br>
-<div>
+<div display="none">
     <b>Preferred camera:</b>
     <select id="cam-list">
         <option value="environment" selected>Environment Facing (default)</option>
@@ -43,7 +42,7 @@
 </div>
 <b>Camera has flash: </b>
 <span id="cam-has-flash"></span>
-<div>
+<div display="none">
     <button id="flash-toggle">📸 Flash: <span id="flash-state">off</span></button>
 </div>
 <br>
@@ -187,7 +186,7 @@
         height: 100%;
         object-fit: cover;
     }
-    
+
     #video-container.example-style-1 .scan-region-highlight-svg,
     #video-container.example-style-1 .code-outline-highlight {
         stroke: #64a2f3 !important;
