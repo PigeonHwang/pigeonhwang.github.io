@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <title>QR Scanner Demo</title>
 </head>
-<body>
+<body bgcolor='black'>
 <div id="video-container">
     <video id="qr-video"></video>
 </div>
-<div display="none">
+<div hidden>
     <label>
         Highlight Style
         <select id="scan-region-highlight-style-select">
@@ -22,7 +22,7 @@
         Show scan region canvas
     </label>
 </div>
-<div display="none">
+<div hidden>
     <select id="inversion-mode-select">
         <option value="original">Scan original (dark QR code on bright background)</option>
         <option value="invert">Scan with inverted colors (bright QR code on dark background)</option>
@@ -30,10 +30,8 @@
     </select>
     <br>
 </div>
-<b>Device has camera: </b>
-<span id="cam-has-camera"></span>
-<br>
-<div display="none">
+<span id="cam-has-camera" hidden></span>
+<div hidden>
     <b>Preferred camera:</b>
     <select id="cam-list">
         <option value="environment" selected>Environment Facing (default)</option>
@@ -41,25 +39,16 @@
     </select>
 </div>
 <b>Camera has flash: </b>
-<span id="cam-has-flash"></span>
-<div display="none">
+<span id="cam-has-flash" hidden></span>
+<div hidden>
     <button id="flash-toggle">📸 Flash: <span id="flash-state">off</span></button>
 </div>
-<br>
-<b>Detected QR code: </b>
-<span id="cam-qr-result">None</span>
-<br>
-<b>Last detected at: </b>
-<span id="cam-qr-result-timestamp"></span>
-<br>
-<button id="start-button">Start</button>
-<button id="stop-button">Stop</button>
-<hr>
-
-<h1>Scan from File:</h1>
-<input type="file" id="file-selector">
-<b>Detected QR code: </b>
-<span id="file-qr-result">None</span>
+<span id="cam-qr-result" hidden>None</span>
+<span id="cam-qr-result-timestamp" hidden></span>
+<button id="start-button" hidden>Start</button>
+<button id="stop-button" hidden>Stop</button>
+<input type="file" id="file-selector" hidden>
+<span id="file-qr-result" hidden>None</span>
 
 <!--<script src="../qr-scanner.umd.min.js"></script>-->
 <!--<script src="../qr-scanner.legacy.min.js"></script>-->
