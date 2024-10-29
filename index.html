@@ -1,31 +1,218 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-    <!-- we import arjs version without NFT but with marker + location based support -->
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    <script>
-        window.onload = (event) => {
-            document.getElementById('ahu1_value').setAttribute('value', 'AHU #2');
-        }
-    </script>
+    <meta charset="UTF-8">
+    <title>QR Scanner Demo</title>
 </head>
-<body style="margin : 0px; overflow: hidden;">
-    <a-scene embedded arjs>
-        <a-marker preset="hiro">
-            <!-- <a-image src="./images/elec_board.png" rotation="-90 0 0" width="3" height="6" ></a-image> -->
-            <a-image src="./images/ahu_test.gif" rotation="-90 0 0" width="3" height="6" ></a-image>
-            <!-- <a-plane position="0 0 0" rotation="-90 0 0" width="4" height="6" color="#323c48"></a-plane>
-            <a-text id="rc" value="SHV-3" position="-0.2 0.2 -2.2" rotation="-90 0 0" width="5" color="white"></a-text>
-            <a-text id="rc" value="R-CURRENT" position="-1.2 0.2 -1.4" rotation="-90 0 0" width="3" color="white"></a-text>
-            <a-text id="sc" value="S-CURRENT" position="-1.2 0.2 -1.0" rotation="-90 0 0" width="3" color="white"></a-text>
-            <a-text id="tc" value="T-CURRENT" position="-1.2 0.2 -0.6" rotation="-90 0 0" width="3" color="white"></a-text>
-            <a-text id="rv" value="R-VOLTAGE" position="-1.2 0.2 -0.2" rotation="-90 0 0" width="3" color="white"></a-text>
-            <a-text id="sv" value="S-VOLTAGE" position="-1.2 0.2 0.2" rotation="-90 0 0" width="3" color="white"></a-text>
-            <a-text id="tv" value="T-VOLTAGE" position="-1.2 0.2 0.6" rotation="-90 0 0" width="3" color="white"></a-text> -->
-        </a-marker>
-        <a-entity camera></a-entity>
-    </a-scene>
+<body bgcolor='black'>
+<div id="video-container">
+    <video id="qr-video"></video>
+</div>
+<div hidden>
+    <label>
+        Highlight Style
+        <select id="scan-region-highlight-style-select">
+            <option value="default-style">Default style</option>
+            <option value="example-style-1">Example custom style 1</option>
+            <option value="example-style-2">Example custom style 2</option>
+        </select>
+    </label>
+    <label>
+        <input id="show-scan-region" type="checkbox">
+        Show scan region canvas
+    </label>
+</div>
+<div hidden>
+    <select id="inversion-mode-select">
+        <option value="original">Scan original (dark QR code on bright background)</option>
+        <option value="invert">Scan with inverted colors (bright QR code on dark background)</option>
+        <option value="both">Scan both</option>
+    </select>
+    <br>
+</div>
+<span id="cam-has-camera" hidden></span>
+<div hidden>
+    <b>Preferred camera:</b>
+    <select id="cam-list">
+        <option value="environment" selected>Environment Facing (default)</option>
+        <option value="user">User Facing</option>
+    </select>
+</div>
+<b>Camera has flash: </b>
+<span id="cam-has-flash" hidden></span>
+<div hidden>
+    <button id="flash-toggle">📸 Flash: <span id="flash-state">off</span></button>
+</div>
+<span id="cam-qr-result" hidden>None</span>
+<span id="cam-qr-result-timestamp" hidden></span>
+<button id="start-button" hidden>Start</button>
+<button id="stop-button" hidden>Stop</button>
+<!-- <input type="file" id="file-selector"> -->
+<span id="file-qr-result" hidden>None</span>
+
+<!--<script src="../qr-scanner.umd.min.js"></script>-->
+<!--<script src="../qr-scanner.legacy.min.js"></script>-->
+<script type="module">
+    import QrScanner from "./qr-scanner-master/qr-scanner.min.js";
+
+    const video = document.getElementById('qr-video');
+    const videoContainer = document.getElementById('video-container');
+    const camHasCamera = document.getElementById('cam-has-camera');
+    const camList = document.getElementById('cam-list');
+    const camHasFlash = document.getElementById('cam-has-flash');
+    const flashToggle = document.getElementById('flash-toggle');
+    const flashState = document.getElementById('flash-state');
+    const camQrResult = document.getElementById('cam-qr-result');
+    const camQrResultTimestamp = document.getElementById('cam-qr-result-timestamp');
+    // const fileSelector = document.getElementById('file-selector');
+    // const fileQrResult = document.getElementById('file-qr-result');
+
+    function setResult(label, result) {
+        console.log(result.data);
+        label.textContent = result.data;
+        camQrResultTimestamp.textContent = new Date().toString();
+        label.style.color = 'teal';
+        clearTimeout(label.highlightTimeout);
+        label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
+    }
+
+    // ####### Web Cam Scanning #######
+
+    const scanner = new QrScanner(video, result => setResult(camQrResult, result), {
+        onDecodeError: error => {
+            camQrResult.textContent = error;
+            camQrResult.style.color = 'inherit';
+        },
+        // highlightScanRegion: true,
+        // highlightCodeOutline: true,
+        highlightScanRegion: false,
+        highlightCodeOutline: false,
+    });
+
+    const updateFlashAvailability = () => {
+        scanner.hasFlash().then(hasFlash => {
+            camHasFlash.textContent = hasFlash;
+            flashToggle.style.display = hasFlash ? 'inline-block' : 'none';
+        });
+    };
+
+    scanner.start().then(() => {
+        updateFlashAvailability();
+        // List cameras after the scanner started to avoid listCamera's stream and the scanner's stream being requested
+        // at the same time which can result in listCamera's unconstrained stream also being offered to the scanner.
+        // Note that we can also start the scanner after listCameras, we just have it this way around in the demo to
+        // start the scanner earlier.
+        QrScanner.listCameras(true).then(cameras => cameras.forEach(camera => {
+            const option = document.createElement('option');
+            option.value = camera.id;
+            option.text = camera.label;
+            camList.add(option);
+        }));
+    });
+
+    QrScanner.hasCamera().then(hasCamera => camHasCamera.textContent = hasCamera);
+
+    // for debugging
+    window.scanner = scanner;
+
+    document.getElementById('scan-region-highlight-style-select').addEventListener('change', (e) => {
+        videoContainer.className = e.target.value;
+        scanner._updateOverlay(); // reposition the highlight because style 2 sets position: relative
+    });
+
+    document.getElementById('show-scan-region').addEventListener('change', (e) => {
+        const input = e.target;
+        const label = input.parentNode;
+        label.parentNode.insertBefore(scanner.$canvas, label.nextSibling);
+        scanner.$canvas.style.display = input.checked ? 'block' : 'none';
+    });
+
+    document.getElementById('inversion-mode-select').addEventListener('change', event => {
+        scanner.setInversionMode(event.target.value);
+    });
+
+    camList.addEventListener('change', event => {
+        scanner.setCamera(event.target.value).then(updateFlashAvailability);
+    });
+
+    flashToggle.addEventListener('click', () => {
+        scanner.toggleFlash().then(() => flashState.textContent = scanner.isFlashOn() ? 'on' : 'off');
+    });
+
+    document.getElementById('start-button').addEventListener('click', () => {
+        scanner.start();
+    });
+
+    document.getElementById('stop-button').addEventListener('click', () => {
+        scanner.stop();
+    });
+
+    // ####### File Scanning #######
+
+    // fileSelector.addEventListener('change', event => {
+    //     const file = fileSelector.files[0];
+    //     if (!file) {
+    //         return;
+    //     }
+    //     QrScanner.scanImage(file, { returnDetailedScanResult: true })
+    //         .then(result => setResult(fileQrResult, result))
+    //         .catch(e => setResult(fileQrResult, { data: e || 'No QR code found.' }));
+    // });
+</script>
+
+<style>
+    div {
+        margin-bottom: 16px;
+    }
+
+    #video-container {
+        line-height: 0;
+        width: 100%;
+        height: 100dvh;
+        overflow: hidden;
+    }
+
+    #qr-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    #video-container.example-style-1 .scan-region-highlight-svg,
+    #video-container.example-style-1 .code-outline-highlight {
+        stroke: #64a2f3 !important;
+    }
+
+    #video-container.example-style-2 {
+        position: relative;
+        width: max-content;
+        height: max-content;
+        overflow: hidden;
+    }
+    #video-container.example-style-2 .scan-region-highlight {
+        border-radius: 30px;
+        outline: rgba(0, 0, 0, .25) solid 50vmax;
+    }
+    #video-container.example-style-2 .scan-region-highlight-svg {
+        display: none;
+    }
+    #video-container.example-style-2 .code-outline-highlight {
+        stroke: rgba(255, 255, 255, .5) !important;
+        stroke-width: 15 !important;
+        stroke-dasharray: none !important;
+    }
+
+    #flash-toggle {
+        display: none;
+    }
+
+    hr {
+        margin-top: 32px;
+    }
+    input[type="file"] {
+        display: block;
+        margin-bottom: 16px;
+    }
+</style>
 </body>
 </html>
