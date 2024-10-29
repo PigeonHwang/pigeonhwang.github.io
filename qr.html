@@ -47,7 +47,7 @@
 <span id="cam-qr-result-timestamp" hidden></span>
 <button id="start-button" hidden>Start</button>
 <button id="stop-button" hidden>Stop</button>
-<input type="file" id="file-selector" hidden>
+<!-- <input type="file" id="file-selector"> -->
 <span id="file-qr-result" hidden>None</span>
 
 <!--<script src="../qr-scanner.umd.min.js"></script>-->
@@ -64,8 +64,8 @@
     const flashState = document.getElementById('flash-state');
     const camQrResult = document.getElementById('cam-qr-result');
     const camQrResultTimestamp = document.getElementById('cam-qr-result-timestamp');
-    const fileSelector = document.getElementById('file-selector');
-    const fileQrResult = document.getElementById('file-qr-result');
+    // const fileSelector = document.getElementById('file-selector');
+    // const fileQrResult = document.getElementById('file-qr-result');
 
     function setResult(label, result) {
         console.log(result.data);
@@ -74,7 +74,6 @@
         label.style.color = 'teal';
         clearTimeout(label.highlightTimeout);
         label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
-        prompt("인식")
     }
 
     // ####### Web Cam Scanning #######
