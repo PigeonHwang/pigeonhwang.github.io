@@ -74,6 +74,7 @@
         label.style.color = 'teal';
         clearTimeout(label.highlightTimeout);
         label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
+        prompt("인식")
     }
 
     // ####### Web Cam Scanning #######
@@ -147,15 +148,15 @@
 
     // ####### File Scanning #######
 
-    fileSelector.addEventListener('change', event => {
-        const file = fileSelector.files[0];
-        if (!file) {
-            return;
-        }
-        QrScanner.scanImage(file, { returnDetailedScanResult: true })
-            .then(result => setResult(fileQrResult, result))
-            .catch(e => setResult(fileQrResult, { data: e || 'No QR code found.' }));
-    });
+    // fileSelector.addEventListener('change', event => {
+    //     const file = fileSelector.files[0];
+    //     if (!file) {
+    //         return;
+    //     }
+    //     QrScanner.scanImage(file, { returnDetailedScanResult: true })
+    //         .then(result => setResult(fileQrResult, result))
+    //         .catch(e => setResult(fileQrResult, { data: e || 'No QR code found.' }));
+    // });
 </script>
 
 <style>
