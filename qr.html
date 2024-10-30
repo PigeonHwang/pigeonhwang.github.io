@@ -96,7 +96,9 @@
 <p id="popupCost"></p>
 <p id="popupOtherInfo"></p>
 </div>
-
+<div id="detect" hidden>
+    인식 성공
+</div>
 
 
 <!--<script src="../qr-scanner.umd.min.js"></script>-->
@@ -126,6 +128,7 @@
     const alarmPopup = document.getElementById('alarmPopup');
     const closePopupButton = document.querySelector('.close-btn');
     const cameraSwitchButton = document.getElementById('cameraSwitchButton');
+    const detectV = document.getElementById('detect');
 
 
     function setResult(label, result) {
@@ -136,8 +139,9 @@
         clearTimeout(label.highlightTimeout);
         label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
 
-        
-        infoPanel.classList.add('visible');
+
+        detectV.classList.remove("hidden");
+        detectV.classList.add("visible");
     }
 
     // ####### Web Cam Scanning #######
@@ -149,7 +153,8 @@
 
 
             
-            infoPanel.classList.remove('visible');
+            detectV.classList.remove('visible');
+            detectV.classList.add("hidden");
         },
         // highlightScanRegion: true,
         // highlightCodeOutline: true,
