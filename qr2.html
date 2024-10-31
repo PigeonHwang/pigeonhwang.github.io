@@ -90,6 +90,8 @@
 <script type="module">
     import QrScanner from "./qr-scanner-master/qr-scanner.min.js";
 
+    let detectedQr = "";
+
     const video = document.getElementById('qr-video');
     // const videoContainer = document.getElementById('video-container');
     const camHasCamera = document.getElementById('cam-has-camera');
@@ -101,14 +103,15 @@
     const camQrResultTimestamp = document.getElementById('cam-qr-result-timestamp');
     // const fileSelector = document.getElementById('file-selector');
     // const fileQrResult = document.getElementById('file-qr-result');
+    const infoPanel = document.getElementById('infoPanel');
 
     function setResult(label, result) {
-        console.log(result.data);
         label.textContent = result.data;
         camQrResultTimestamp.textContent = new Date().toString();
         label.style.color = 'teal';
         clearTimeout(label.highlightTimeout);
         label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
+        detectedQr = result.data;
     }
 
     // ####### Web Cam Scanning #######
@@ -181,6 +184,10 @@
     document.getElementById('stop-button').addEventListener('click', () => {
         scanner.stop();
     });
+
+    function infoPanelFade() {
+        infoPanel.fad
+    }
 
     // ####### File Scanning #######
 
@@ -309,6 +316,7 @@
         color: white;
         opacity: 1;
         transition: opacity 0.5s ease;
+        bottom: 0;
     }
     .info-panel.visible {
         opacity: 1;
