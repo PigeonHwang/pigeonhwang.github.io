@@ -79,13 +79,13 @@
             </div>
         </div>
         <div class="form-item">
-            <a href="#" class="button is-link">알람 이력</a>
+            <button type="button" class="button is-button" onclick="login()">알람 이력</button>
         </div>
         <div class="form-item">
-            <a href="#" class="button is-link">간단 매뉴얼</a>
+            <button type="button" class="button is-button" onclick="login()">간편 매뉴얼</button>
         </div>
         <div class="form-item">
-            <a href="#" class="button is-link">전문가 통화</a>
+            <button type="button" class="button is-button" onclick="login()">전문가 통화</button>
         </div>
     </div>
 </div>
@@ -313,7 +313,7 @@
     }
     .info-panel {
         position: absolute;
-        top: 20px;
+        top: 70%;
         left: 20px;
         right: 20px;
         background-color: rgba(0,0,0,0.7);
@@ -325,8 +325,8 @@
         color: white;
         opacity: 1;
         transition: opacity 0.5s ease;
-        bottom: 0;
-        height: 30%;
+        /* bottom: 0; */
+        /* height: 30%; */
     }
     .info-panel.visible {
         opacity: 1;
