@@ -313,7 +313,7 @@
     ];
 
     // 초기화 함수
-    async function initialize() {
+    function initialize() {
         initializeCharts();
         // 데이터 시뮬레이션 (실제 환경에서는 실시간 데이터로 대체)
         setInterval(() => {
@@ -326,7 +326,7 @@
             document.getElementById('airflowValue').textContent = `${airflow.toFixed(0)} CMH`;
 
             updateCharts(temp, humidity, airflow);
-        }, 1000);
+        }, 2000);
     }
 
     // 페이지 로드 시 초기화
