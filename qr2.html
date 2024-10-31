@@ -79,10 +79,10 @@
             </div>
         </div>
         <div class="form-item" style="float: left;">
-            <button type="button" class="button is-button" onclick="login()">알람 이력</button>
+            <button type="button" class="button is-button" onclick="login()">스캔 중지</button>
         </div>
         <div class="form-item" style="float: left;">
-            <button type="button" class="button is-button" onclick="login()">간편 매뉴얼</button>
+            <button type="button" class="button is-button" onclick="login()">알람 이력</button>
         </div>
         <div class="form-item" style="float: right;">
             <button type="button" class="button is-button" onclick="login()">전문가 통화</button>
@@ -96,6 +96,8 @@
 
 <!--<script src="../qr-scanner.umd.min.js"></script>-->
 <!--<script src="../qr-scanner.legacy.min.js"></script>-->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script type="module">
     import QrScanner from "./qr-scanner-master/qr-scanner.min.js";
 
@@ -209,6 +211,126 @@
     //         .then(result => setResult(fileQrResult, result))
     //         .catch(e => setResult(fileQrResult, { data: e || 'No QR code found.' }));
     // });
+
+
+
+
+    /* 임시 데이터 생성 */
+
+    // 차트 초기화 함수
+    function initializeCharts() {
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { display: false },
+                y: { display: false }
+            },
+            plugins: { legend: { display: false } }
+        };
+
+        new Chart(document.getElementById('tempChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: Array(10).fill(''),
+                datasets: [{
+                    data: Array(10).fill(null),
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1,
+                    fill: false
+                }]
+            },
+            options: chartOptions
+        });
+
+        new Chart(document.getElementById('humidityChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: Array(10).fill(''),
+                datasets: [{
+                    data: Array(10).fill(null),
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    fill: false
+                }]
+            },
+            options: chartOptions
+        });
+
+        new Chart(document.getElementById('airflowChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: Array(10).fill(''),
+                datasets: [{
+                    data: Array(10).fill(null),
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 1,
+                    fill: false
+                }]
+            },
+            options: chartOptions
+        });
+    }
+
+    // 차트 업데이트 함수
+    function updateCharts(temp, humidity, airflow) {
+        const charts = [
+            document.getElementById('tempChart'),
+            document.getElementById('humidityChart'),
+            document.getElementById('airflowChart')
+        ];
+        const values = [temp, humidity, airflow];
+
+        charts.forEach((chart, index) => {
+            const chartInstance = Chart.getChart(chart);
+            chartInstance.data.datasets[0].data.push(values[index]);
+            chartInstance.data.datasets[0].data.shift();
+            chartInstance.update();
+        });
+    }
+
+    // 알람 데이터 (예시)
+    const alarmData = [
+        {
+            date: '2023-09-15',
+            content: '온도 상승',
+            cause: '냉각수 누수',
+            imageBefore: '/api/placeholder/400/300',
+            imageAfter: '/api/placeholder/400/300',
+            cost: '500,000원',
+            otherInfo: '부품 교체 완료'
+        },
+        {
+            date: '2023-09-20',
+            content: '습도 이상',
+            cause: '습도 센서 오류',
+            imageBefore: '/api/placeholder/400/300',
+            imageAfter: '/api/placeholder/400/300',
+            cost: '200,000원',
+            otherInfo: '센서 교체 완료'
+        }
+    ];
+
+    // 초기화 함수
+    async function initialize() {
+        initializeCharts();
+        // 데이터 시뮬레이션 (실제 환경에서는 실시간 데이터로 대체)
+        setInterval(() => {
+            console.log("zz")
+            const temp = 20 + Math.random() * 10;
+            const humidity = 40 + Math.random() * 20;
+            const airflow = 800 + Math.random() * 400;
+
+            document.getElementById('tempValue').textContent = `${temp.toFixed(1)}°C`;
+            document.getElementById('humidityValue').textContent = `${humidity.toFixed(1)}%`;
+            document.getElementById('airflowValue').textContent = `${airflow.toFixed(0)} CMH`;
+
+            updateCharts(temp, humidity, airflow);
+        }, 1000);
+    }
+
+    // 페이지 로드 시 초기화
+    window.onload = initialize;
 </script>
 
 <style>
@@ -391,12 +513,19 @@
         border: none;
         outline:none;
         transition: all 200ms;
+        margin: 0 auto;
     }
 
     .form-item {
-        text-align: center;
         align-items: center;
         width: 33%;
+    }
+
+    
+    .chart-container {
+        width: 100px;
+        height: 30px;
+        margin-left: 10px;
     }
 </style>
 </body>
