@@ -50,51 +50,34 @@
 <!-- <input type="file" id="file-selector"> -->
 <span id="file-qr-result" hidden>None</span>
 
-
-<div id="infoPanel" class="info-panel">
-    <h3>공조기(AHU-2) 상태</h3>
-    <div class="machine-status">
-        <span class="status-label">온도</span>
-        <div style="display: flex; align-items: center;">
-            <span id="tempIndicator" class="status-indicator status-ok"></span>
-            <span id="tempValue" class="status-value">25°C</span>
-            <div class="chart-container"><canvas id="tempChart"></canvas></div>
+<div class="app-container">
+    <div id="infoPanel" class="info-panel">
+        <h3>공조기(AHU-2) 상태</h3>
+        <div class="machine-status">
+            <span class="status-label">온도</span>
+            <div style="display: flex; align-items: center;">
+                <span id="tempIndicator" class="status-indicator status-ok"></span>
+                <span id="tempValue" class="status-value">25°C</span>
+                <div class="chart-container"><canvas id="tempChart"></canvas></div>
+            </div>
+        </div>
+        <div class="machine-status">
+            <span class="status-label">습도</span>
+            <div style="display: flex; align-items: center;">
+                <span id="humidityIndicator" class="status-indicator status-ok"></span>
+                <span id="humidityValue" class="status-value">50%</span>
+                <div class="chart-container"><canvas id="humidityChart"></canvas></div>
+            </div>
+        </div>
+        <div class="machine-status">
+            <span class="status-label">풍량</span>
+            <div style="display: flex; align-items: center;">
+                <span id="airflowIndicator" class="status-indicator status-ok"></span>
+                <span id="airflowValue" class="status-value">1000 CMH</span>
+                <div class="chart-container"><canvas id="airflowChart"></canvas></div>
+            </div>
         </div>
     </div>
-    <div class="machine-status">
-        <span class="status-label">습도</span>
-        <div style="display: flex; align-items: center;">
-            <span id="humidityIndicator" class="status-indicator status-ok"></span>
-            <span id="humidityValue" class="status-value">50%</span>
-            <div class="chart-container"><canvas id="humidityChart"></canvas></div>
-        </div>
-    </div>
-    <div class="machine-status">
-        <span class="status-label">풍량</span>
-        <div style="display: flex; align-items: center;">
-            <span id="airflowIndicator" class="status-indicator status-ok"></span>
-            <span id="airflowValue" class="status-value">1000 CMH</span>
-            <div class="chart-container"><canvas id="airflowChart"></canvas></div>
-        </div>
-    </div>
-</div>
-<div class="alarm-history" id="alarmHistory">
-    <!-- 알람 이력 항목들이 여기에 동적으로 추가됩니다 -->
-</div>
-<div class="controls">
-    <button id="startButton" class="btn">시작</button>
-    <button id="historyButton" class="btn">이력</button>
-    <button id="callButton" class="btn">통화</button>
-</div>
-</div>
-<div id="alarmPopup" class="popup">
-<button class="close-btn">&times;</button>
-<h3 id="popupTitle"></h3>
-<p id="popupCause"></p>
-<img id="popupImageBefore" alt="조치 전">
-<img id="popupImageAfter" alt="조치 후">
-<p id="popupCost"></p>
-<p id="popupOtherInfo"></p>
 </div>
 
 
@@ -262,9 +245,27 @@
         margin-bottom: 16px;
     }
 
+    
 
-
-
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: 'Roboto', sans-serif;
+        overflow: hidden;
+    }
+    .app-container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    #videoElement, #overlay {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
     .controls {
         position: absolute;
         bottom: 20px;
@@ -300,7 +301,7 @@
         z-index: 1000;
         font-weight: 300;
         color: white;
-        opacity: 0;
+        opacity: 1;
         transition: opacity 0.5s ease;
     }
     .info-panel.visible {
@@ -343,61 +344,8 @@
         height: 30px;
         margin-left: 10px;
     }
-    .alarm-history {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: rgba(0,0,0,0.9);
-        backdrop-filter: blur(10px);
-        border-radius: 15px;
-        padding: 15px;
-        z-index: 2000;
-        font-weight: 300;
-        color: white;
-        max-height: 80%;
-        width: 80%;
-        overflow-y: auto;
-        display: none;
-    }
-    .alarm-item {
-        padding: 10px 0;
-        border-bottom: 1px solid rgba(255,255,255,0.3);
-        cursor: pointer;
-    }
-    .alarm-item:last-child {
-        border-bottom: none;
-    }
-    .popup {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        z-index: 2000;
-        max-width: 80%;
-        max-height: 80%;
-        overflow-y: auto;
-        display: none;
-    }
-    .popup h3 {
+    h3 {
         margin-top: 0;
-    }
-    .popup img {
-        max-width: 100%;
-        height: auto;
-        margin: 10px 0;
-    }
-    .close-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: none;
-        border: none;
-        font-size: 20px;
-        cursor: pointer;
     }
 </style>
 </body>
