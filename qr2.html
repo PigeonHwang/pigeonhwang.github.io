@@ -272,13 +272,14 @@
         });
     }
 
+    const charts = [
+        document.getElementById('tempChart'),
+        document.getElementById('humidityChart'),
+        document.getElementById('airflowChart')
+    ];
+
     // 차트 업데이트 함수
     function updateCharts(temp, humidity, airflow) {
-        const charts = [
-            document.getElementById('tempChart'),
-            document.getElementById('humidityChart'),
-            document.getElementById('airflowChart')
-        ];
         const values = [temp, humidity, airflow];
 
         charts.forEach((chart, index) => {
@@ -485,7 +486,7 @@
     }
     .status-label {
         margin-left: 10px;
-        font-size: 14px;
+        font-size: 16px;
         opacity: 0.8;
     }
     .chart-container {
