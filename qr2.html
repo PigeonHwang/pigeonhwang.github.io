@@ -125,7 +125,7 @@
         label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
         detectedQr = result.data;
 
-        if(result == 'project=HL-2412;type=AHU;name=AHU-1;') {
+        if(result.data == 'project=HL-2412;type=AHU;name=AHU-1;') {
             alert('인식 성공');
             infoPanel.classList.remove('hidden');
             infoPanel.classList.add('visible');
