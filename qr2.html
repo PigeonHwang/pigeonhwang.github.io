@@ -140,7 +140,7 @@
         onDecodeError: error => {
             infoPanel.classList.remove('visible');
             infoPanel.classList.add('hidden');
-            console.log('no qr')
+            console.log(error);
             camQrResult.textContent = error;
             camQrResult.style.color = 'inherit';
         },
