@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>QR 코드 인식</title>
-    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <script src="https://pigeonhwang.github.io/ar4industry/qr-scanner-master/qr-scanner.min.js"></script>
     <style>
         #myDiv {
             display: none;
@@ -56,16 +56,8 @@
         }
     }
 
-    const html5QrCode = new Html5Qrcode("qr-reader");
-    html5QrCode.start(
-        { facingMode: "environment" }, 
-        {
-            fps: 10,
-            qrbox: 250
-        },
-        handleQRCodeScanned,
-        handleQRCodeScanError
-    );
+    const qrScanner = new QrScanner("qr-reader", handleQRCodeScanned, handleQRCodeScanError);
+    qrScanner.start();
 
     window.onload = startCamera;
 
