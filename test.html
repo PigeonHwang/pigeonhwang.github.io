@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>QR 코드 인식</title>
-    <script src="https://pigeonhwang.github.io/ar4industry/qr-scanner-master/qr-scanner.min.js"></script>
     <style>
         #myDiv {
             display: none;
@@ -29,6 +28,7 @@
 <video id="camera-feed" autoplay></video>
 
 <script>
+    import QrScanner from "https://pigeonhwang.github.io/ar4industry/qr-scanner-master/qr-scanner.min.js";
     function handleQRCodeScanned(decodedText, decodedResult) {
         const targetQRCode = "example-qr-code"; 
         const div = document.getElementById('myDiv');
