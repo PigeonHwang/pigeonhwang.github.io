@@ -125,8 +125,14 @@
         label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
         detectedQr = result.data;
 
-        infoPanel.classList.remove('hidden');
-        infoPanel.classList.add('visible');
+        if(result == 'project=HL-2412;type=AHU;name=AHU-1;') {
+            alert('인식 성공');
+            infoPanel.classList.remove('hidden');
+            infoPanel.classList.add('visible');
+        } else {
+            infoPanel.classList.remove('visible');
+            infoPanel.classList.add('hidden');
+        }
     }
 
     // ####### Web Cam Scanning #######
@@ -135,9 +141,6 @@
         onDecodeError: error => {
             camQrResult.textContent = error;
             camQrResult.style.color = 'inherit';
-
-            infoPanel.classList.remove('visible');
-            infoPanel.classList.add('hidden');
         },
         // highlightScanRegion: true,
         // highlightCodeOutline: true,
