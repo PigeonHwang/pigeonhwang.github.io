@@ -124,7 +124,9 @@
         clearTimeout(label.highlightTimeout);
         label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
         detectedQr = result.data;
-        infoPanel.style.visibility = 'visible';
+
+        infoPanel.classList.remove('hidden');
+        infoPanel.classList.add('visible');
     }
 
     // ####### Web Cam Scanning #######
@@ -133,7 +135,9 @@
         onDecodeError: error => {
             camQrResult.textContent = error;
             camQrResult.style.color = 'inherit';
-            infoPanel.style.visibility = 'hidden';
+
+            infoPanel.classList.remove('visible');
+            infoPanel.classList.add('hidden');
         },
         // highlightScanRegion: true,
         // highlightCodeOutline: true,
@@ -556,6 +560,19 @@
     .form-item {
         align-items: center;
         width: 33%;
+    }
+
+    
+    #infoPanel {
+        display: none;
+        transition: opacity 1s ease-out;
+    }
+    .visible {
+        display: block;
+        opacity: 1;
+    }
+    .hidden {
+        opacity: 0;
     }
 </style>
 </body>
