@@ -138,6 +138,8 @@
 
     const scanner = new QrScanner(video, result => setResult(camQrResult, result), {
         onDecodeError: error => {
+            infoPanel.classList.remove('visible');
+            infoPanel.classList.add('hidden');
             console.log('no qr')
             camQrResult.textContent = error;
             camQrResult.style.color = 'inherit';
