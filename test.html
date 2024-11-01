@@ -27,7 +27,7 @@
 <div id="qr-reader" style="width:300px;"></div>
 <video id="camera-feed" autoplay></video>
 
-<script>
+<script type="module">
     import QrScanner from "https://pigeonhwang.github.io/ar4industry/qr-scanner-master/qr-scanner.min.js";
     function handleQRCodeScanned(decodedText, decodedResult) {
         const targetQRCode = "example-qr-code"; 
