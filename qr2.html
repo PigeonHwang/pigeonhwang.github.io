@@ -488,13 +488,11 @@
         z-index: 1000;
         font-weight: 300;
         color: white;
-        opacity: 1;
+        /* opacity: 1; */
         transition: opacity 0.5s ease;
         /* bottom: 0; */
         /* height: 30%; */
-    }
-    .info-panel.visible {
-        opacity: 1;
+        display: none;
     }
     .info-panel h3 {
         margin-top: 0;
@@ -564,11 +562,6 @@
         width: 33%;
     }
 
-    
-    #infoPanel {
-        display: none;
-        transition: opacity 1s ease-out;
-    }
     .visible {
         display: block;
         opacity: 1;
