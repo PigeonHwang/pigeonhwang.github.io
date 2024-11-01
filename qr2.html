@@ -101,7 +101,7 @@
 <script type="module">
     import QrScanner from "https://pigeonhwang.github.io/ar4industry/qr-scanner-master/qr-scanner.min.js";
 
-    let detectedQr = "";
+    let qrDetected = false;
 
     const video = document.getElementById('qr-video');
     // const videoContainer = document.getElementById('video-container');
@@ -125,12 +125,10 @@
         label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
         detectedQr = result.data;
 
-        if(result.data == 'project=HL-2412;type=AHU;name=AHU-1;') {
+        if(!qrDetected) {
             infoPanel.classList.remove('hidden');
             infoPanel.classList.add('visible');
-        } else {
-            infoPanel.classList.remove('visible');
-            infoPanel.classList.add('hidden');
+            qrDetected = true;
         }
     }
 
@@ -138,8 +136,11 @@
 
     const scanner = new QrScanner(video, result => setResult(camQrResult, result), {
         onDecodeError: error => {
+            if(qrDetected) {
             infoPanel.classList.remove('visible');
             infoPanel.classList.add('hidden');
+                qrDetected = false;
+            }
             console.log(error);
             camQrResult.textContent = error;
             camQrResult.style.color = 'inherit';
@@ -148,7 +149,7 @@
         // highlightCodeOutline: true,
         highlightScanRegion: false,
         highlightCodeOutline: false,
-    }, 2000);
+    });
 
     const updateFlashAvailability = () => {
         scanner.hasFlash().then(hasFlash => {
